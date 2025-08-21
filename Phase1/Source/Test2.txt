@@ -1,0 +1,7 @@
+// Test
+OK // End of line comment
+/* teSt */
+-.555 /*****/
+/**
+	sdfnk skdf snlk jdf
+	dsfj jsdf fvc*/

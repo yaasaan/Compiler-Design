@@ -1,0 +1,14 @@
+void method1(int x, int y) {
+	for (; y >= -2; y--) {
+		int z = method2();
+		int diff = x - y;
+		if (diff % z != 0) System.out.println("summertime(" + y + ")");
+		else System.out.println("sadness(" + y + ")");
+	}
+}
+
+int method2() {
+	Random random = new Random();
+	int rand = random.nextInt(10) + 1;
+	return rand;
+}

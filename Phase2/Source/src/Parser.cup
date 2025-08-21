@@ -1,0 +1,222 @@
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.ScannerBuffer;
+import java.io.*;
+
+
+
+parser code {:
+    public Parser(Scanner scan, ComplexSymbolFactory sf) {
+        super(scan, sf);
+    }
+    public static void main(String[] args) throws Exception {
+        // initialize the symbol factory
+        ComplexSymbolFactory csf = new ComplexSymbolFactory();
+        // create a buffering scanner wrapper
+        ScannerBuffer scanner = new ScannerBuffer(new Scanner(new BufferedReader(new FileReader(args[0])), csf));
+        // start parsing
+        Parser parser = new Parser(scanner, csf);
+        try {
+            parser.parse();
+            System.out.println("\nScan and parse finished successfully!");
+        } catch (Exception e) {
+            if (e.getMessage().equals("lexical")) System.out.println("\nLexical error detected! See above details ￪");
+            else System.out.println("\nSyntax error detected! See above details ￪");
+        }
+    }
+:};
+
+
+
+terminal INT;
+terminal VOID;
+terminal IF;
+terminal ELSE;
+terminal FOR;
+terminal NEW;
+terminal RETURN;
+
+terminal TRUE;
+terminal FALSE;
+
+terminal LPAR;
+terminal RPAR;
+terminal BEGIN;
+terminal END;
+terminal SEMI;
+terminal COMMA;
+terminal DOT;
+
+terminal ASSIGN;
+terminal GTEQ;
+terminal NEQ;
+terminal DEC;
+terminal PLUS;
+terminal MINUS;
+terminal MOD;
+
+terminal INTEGER;
+
+terminal IDENT;
+
+terminal STRING;
+
+
+non terminal program;
+non terminal functions;
+non terminal function;
+non terminal params;
+non terminal param;
+non terminal stmts;
+non terminal stmt;
+non terminal if_stmt;
+non terminal expr;
+non terminal equality_expression;
+non terminal num_expr;
+non terminal num_op;
+non terminal type;
+non terminal assignment;
+non terminal for_statement;
+non terminal for_init_opt;
+non terminal for_init;
+non terminal for_update_opt;
+non terminal for_update;
+non terminal postdecrement_expression;
+non terminal method_invocation;
+non terminal argument_list_opt;
+non terminal argument_list;
+non terminal argument;
+non terminal name;
+non terminal simple_name;
+non terminal qualified_name;
+non terminal return_statement;
+non terminal new_expression;
+
+
+
+precedence left PLUS, MINUS;
+precedence left MOD;
+precedence left ELSE;
+precedence left NEW;
+
+
+
+start with program;
+
+
+
+program ::= functions
+    ;
+
+functions ::= functions function
+    | /* empty */
+    ;
+
+function ::= VOID IDENT params stmt
+    | INT IDENT params stmt
+    ;
+
+params ::= LPAR param RPAR;
+
+param ::= param COMMA INT IDENT
+    | INT IDENT
+    | /* empty */
+    ;
+
+stmts ::= stmts SEMI stmt
+    | stmt
+    ;
+
+stmt ::= for_statement
+    | if_stmt
+    | return_statement
+    | assignment
+    | method_invocation
+    | BEGIN stmts END
+    ;
+
+for_statement ::= FOR LPAR for_init_opt SEMI equality_expression SEMI for_update_opt RPAR stmt
+    ;
+
+for_init_opt ::= for_init
+	| /* empty */
+	;
+
+for_init ::= assignment
+	;
+
+for_update_opt ::= for_update
+	| /* empty */
+	;
+
+for_update ::= assignment
+    | postdecrement_expression
+    | method_invocation
+    ;
+
+postdecrement_expression ::= IDENT DEC
+	;
+
+method_invocation ::= name LPAR argument_list_opt RPAR
+	;
+
+argument_list_opt ::= argument_list
+	| /* empty */
+	;
+
+argument_list ::= argument
+	| argument_list COMMA argument
+	;
+
+argument ::= INTEGER
+	| STRING
+	| IDENT
+	| argument PLUS argument
+	;
+
+name ::= simple_name
+	| qualified_name
+	;
+
+simple_name ::=	IDENT
+	;
+
+qualified_name ::= name DOT IDENT
+	;
+
+return_statement ::= RETURN IDENT SEMI
+	;
+
+assignment ::=	type IDENT ASSIGN expr
+    ;
+
+type ::= INT
+    | IDENT
+    ;
+
+if_stmt ::= IF LPAR equality_expression RPAR stmt SEMI ELSE stmt SEMI
+    | IF LPAR equality_expression RPAR stmt ELSE stmt
+    ;
+
+expr ::= new_expression
+    | num_expr
+    | method_invocation
+    | IDENT
+    | TRUE
+    | FALSE
+    ;
+
+new_expression ::= NEW IDENT LPAR argument_list_opt RPAR
+	;
+
+equality_expression ::= expr GTEQ expr
+    | expr NEQ expr
+	;
+
+num_expr ::= INTEGER
+    | expr num_op expr
+    ;
+
+num_op ::= PLUS
+    | MINUS
+    | MOD
+    ;

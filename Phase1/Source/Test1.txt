@@ -1,0 +1,8 @@
+0, 7 -821 -0.039 0.4, +.015 +88, -.61
+Compiler, dxt.init(), EOF
+count++
+			--test
+5.5 * count
+if
+ELSE
+Reza yaSAn
